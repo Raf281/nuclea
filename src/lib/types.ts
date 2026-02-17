@@ -4,8 +4,8 @@
 
 export type UserRole = "admin" | "principal" | "teacher";
 export type WorkType = "essay" | "exam" | "homework" | "project" | "other";
-export type AnalysisMode = "default" | "elementary";
-export type WellbeingLevel = "none" | "mild" | "flag";
+export type AnalysisMode = "elementary" | "highschool" | "university";
+export type MentalMonitoringLevel = "none" | "mild" | "flag";
 
 // ---------- Analysis Result Types ----------
 
@@ -28,8 +28,8 @@ export interface TalentFocus {
   next_steps: string[];
 }
 
-export interface WellbeingResult {
-  level: WellbeingLevel;
+export interface MentalMonitoringResult {
+  level: MentalMonitoringLevel;
   note: string;
   next_step: string;
 }
@@ -44,7 +44,7 @@ export interface AnalysisResult {
   matching_domains: string[];
   learning_recommendations: string[];
   talent_development_focus: TalentFocus[];
-  wellbeing: WellbeingResult | null;
+  mental_monitoring: MentalMonitoringResult | null;
 }
 
 // ---------- Data Models ----------
@@ -116,8 +116,8 @@ export interface Analysis {
   score_originality: number;
   score_coherence: number;
   result_json: AnalysisResult;
-  wellbeing_enabled: boolean;
-  wellbeing_level: WellbeingLevel | null;
+  mental_monitoring_enabled: boolean;
+  mental_monitoring_level: MentalMonitoringLevel | null;
   talent_json: object | null;
   llm_model: string | null;
   processing_time_ms: number | null;
@@ -150,8 +150,8 @@ export interface AnalyzeRequest {
   work_title: string;
   work_type: WorkType;
   text: string;
-  is_elementary: boolean;
-  wellbeing_enabled: boolean;
+  analysis_mode: AnalysisMode;
+  mental_monitoring_enabled: boolean;
 }
 
 export interface CreateStudentRequest {

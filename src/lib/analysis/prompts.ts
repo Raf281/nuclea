@@ -4,13 +4,13 @@
 // IMPORTANT: These prompts are carefully tuned. Do not modify wording without
 // verifying output quality. Evidence-based language is critical.
 
-import type { RubricScores } from "@/lib/types";
+import type { AnalysisMode, RubricScores } from "@/lib/types";
 
-export function buildRubricPrompt(text: string, isElementary: boolean): string {
-  const maxLen = isElementary ? 500 : 2000;
+export function buildRubricPrompt(text: string, mode: AnalysisMode): string {
+  const maxLen = mode === "elementary" ? 500 : mode === "highschool" ? 1500 : 2000;
   const excerpt = text.slice(0, maxLen);
 
-  if (isElementary) {
+  if (mode === "elementary") {
     return `Analyze this elementary school work and assign scores (0-5) across five age-appropriate criteria:
 
 1. **Structure**: Basic organization, sentence flow, simple transitions
@@ -18,6 +18,46 @@ export function buildRubricPrompt(text: string, isElementary: boolean): string {
 3. **Evidence**: Use of examples, personal experiences, simple facts
 4. **Originality**: Personal expression, creative ideas, unique perspectives
 5. **Coherence**: Logical flow, topic consistency, simple connections
+
+**REQUIREMENTS (EVIDENCE-BASED LANGUAGE):**
+- Describe only observable text behavior (structure, reasoning, support)
+- No personality, motivation, emotion, or identity references
+- No adjectives targeting the person (e.g., "creative", "lazy")
+- No speculation about psychology or intention
+- Short, declarative sentences
+- Tie each justification to concrete textual behavior
+- Each justification: 1-2 sentences describing observable behavior + direct quote (≤6 words) as evidence
+
+**Text:**
+${excerpt}
+
+**Respond ONLY with JSON using this schema:**
+{
+  "scores": {
+    "structure": 0-5,
+    "clarity": 0-5,
+    "evidence": 0-5,
+    "originality": 0-5,
+    "coherence": 0-5
+  },
+  "justifications": {
+    "structure": "1-2 sentences describing observable behavior. Include direct quote (≤6 words) as evidence.",
+    "clarity": "1-2 sentences describing observable behavior. Include direct quote (≤6 words) as evidence.",
+    "evidence": "1-2 sentences describing observable behavior. Include direct quote (≤6 words) as evidence.",
+    "originality": "1-2 sentences describing observable behavior. Include direct quote (≤6 words) as evidence.",
+    "coherence": "1-2 sentences describing observable behavior. Include direct quote (≤6 words) as evidence."
+  }
+}`;
+  }
+
+  if (mode === "highschool") {
+    return `Analyze this high school student's work and assign scores (0-5) across five criteria:
+
+1. **Structure**: Organization, paragraph flow, transitions between ideas
+2. **Clarity**: Word choice, sentence variety, readability
+3. **Evidence**: Use of examples, references, supporting arguments
+4. **Originality**: Independent thinking, unique perspectives, creative framing
+5. **Coherence**: Logical progression, argument consistency, thematic unity
 
 **REQUIREMENTS (EVIDENCE-BASED LANGUAGE):**
 - Describe only observable text behavior (structure, reasoning, support)
@@ -92,13 +132,13 @@ ${excerpt}
 export function buildProfilePrompt(
   scores: RubricScores,
   text: string,
-  isElementary: boolean
+  mode: AnalysisMode
 ): string {
-  const maxLen = isElementary ? 500 : 1500;
+  const maxLen = mode === "elementary" ? 500 : mode === "highschool" ? 1200 : 1500;
   const excerpt = text.slice(0, maxLen);
   const scoresJson = JSON.stringify(scores, null, 2);
 
-  if (isElementary) {
+  if (mode === "elementary") {
     return `Analyze this elementary school work and produce a structured profile:
 
 **Scores:**
@@ -135,6 +175,46 @@ D. **3-Day Development Plan**: Three consecutive daily actions (Day 1–Day 3). 
   "growth_areas": ["Concrete skill gap + cited excerpt (≤6 words)", "Concrete skill gap + cited excerpt (≤6 words)", "Concrete skill gap + cited excerpt (≤6 words)"],
   "cognitive_pattern": "2 sentences: reasoning type, information organization, abstraction level, problem-solving approach",
   "development_plan": ["Day 1: Activity related to student interest to improve skill", "Day 2: Activity related to student interest to improve skill", "Day 3: Activity related to student interest to improve skill"]
+}`;
+  }
+
+  if (mode === "highschool") {
+    return `Analyze this high school student's work and produce a structured cognitive profile:
+
+**Scores:**
+${scoresJson}
+
+**Text (excerpt):**
+${excerpt}
+
+**Produce:**
+
+A. **3 Strengths**: Each must be a cognitive skill (e.g., "Analytical reasoning", "Structured argumentation", "Evidence integration") supported by a cited text excerpt (quote ≤6 words).
+
+B. **3 Growth Areas**: Each must be a concrete skill gap (e.g., "Weak source integration", "Limited argument depth", "Inconsistent transitions") supported by a cited text excerpt (quote ≤6 words).
+
+C. **Cognitive Pattern Summary**: 2-3 sentences explaining how the student processes information:
+   - reasoning type (analytical/narrative/comparative)
+   - information organization (structured/thematic/chronological)
+   - abstraction level (moderate/developing)
+   - problem-solving approach (systematic/exploratory/intuitive)
+
+D. **3-Day Development Plan**: Three consecutive daily actions (Day 1–Day 3). Each day = 1 targeted exercise linked to growth areas.
+
+**ABSOLUTE RESTRICTIONS:**
+- Use precise, neutral, skill-based language
+- NO personality, emotion, or character descriptions
+- Focus ONLY on observable cognitive operations
+- NO vague feedback
+- Short, crisp sentences
+- NO emojis, NO psychological diagnosis, NO moral judgement
+
+**Respond ONLY with JSON:**
+{
+  "strengths": ["Cognitive skill name + cited excerpt (≤6 words)", "Cognitive skill name + cited excerpt (≤6 words)", "Cognitive skill name + cited excerpt (≤6 words)"],
+  "growth_areas": ["Concrete skill gap + cited excerpt (≤6 words)", "Concrete skill gap + cited excerpt (≤6 words)", "Concrete skill gap + cited excerpt (≤6 words)"],
+  "cognitive_pattern": "2-3 sentences: reasoning type, information organization, abstraction level, problem-solving approach",
+  "development_plan": ["Day 1: Targeted exercise linked to growth areas", "Day 2: Targeted exercise linked to growth areas", "Day 3: Targeted exercise linked to growth areas"]
 }`;
   }
 
@@ -181,12 +261,12 @@ export function buildTalentPrompt(
   profileData: { strengths: string[]; cognitive_pattern: string },
   scores: RubricScores,
   text: string,
-  isElementary: boolean
+  mode: AnalysisMode
 ): string {
   const scoresJson = JSON.stringify(scores, null, 2);
   const strengthsJson = JSON.stringify(profileData.strengths, null, 2);
 
-  if (isElementary) {
+  if (mode === "elementary") {
     return `Based on this elementary school work, identify talent indicators and matching domains:
 
 **Strengths:**
@@ -228,6 +308,59 @@ F. **Learning Recommendations (3-5 items)**: Concrete, practical recommendations
 {
   "talent_indicators": ["Skill cluster or thinking style", "Skill cluster or thinking style", "Skill cluster or thinking style"],
   "learning_recommendations": ["Subject + specific interest-based example", "Subject + specific interest-based example", "Subject + specific interest-based example"]
+}`;
+  }
+
+  if (mode === "highschool") {
+    return `Based on this high school student's analysis, identify talent indicators and potential directions:
+
+**Strengths:**
+${strengthsJson}
+
+**Cognitive Pattern:**
+${profileData.cognitive_pattern}
+
+**Scores:**
+${scoresJson}
+
+**Text (excerpt):**
+${text.slice(0, 1200)}
+
+**Deliver:**
+
+E. **Talent Indicators (3-5 items)**: Indicators of natural strengths, expressed as:
+   - skill clusters (e.g., "Analytical reasoning + Evidence integration")
+   - ways of thinking (e.g., "Comparative thinking", "Structured argumentation")
+   - emerging academic strengths (e.g., "Scientific reasoning", "Literary analysis")
+
+F. **Matching Domains (3-5 items)**: Academic subjects and potential career directions:
+   - School subjects where the student may excel (e.g., "Advanced Biology", "Literature")
+   - Potential university fields (e.g., "Engineering", "Social Sciences")
+   - Career orientation (e.g., "Research-oriented", "Communication-focused")
+
+G. **Talent Development Focus (1-2 items)**: Prioritized talents for focused development:
+   - Talent name (from talent indicators)
+   - Brief rationale (1 sentence)
+   - 1-2 concrete next steps (specific exercises or activities)
+
+**ABSOLUTE RESTRICTIONS:**
+- Use precise, neutral, skill-based language
+- NO personality, emotion, or character descriptions
+- NO psychological diagnosis
+- NO moral judgement
+- Focus ONLY on observable cognitive operations
+
+**Respond ONLY with JSON:**
+{
+  "talent_indicators": ["Skill cluster or thinking style", "Skill cluster or thinking style", "Skill cluster or thinking style"],
+  "matching_domains": ["Academic field or career direction", "Academic field or career direction", "Academic field or career direction"],
+  "talent_development_focus": [
+    {
+      "talent": "Talent name from indicators",
+      "rationale": "1 sentence: why prioritize this talent",
+      "next_steps": ["Concrete action 1", "Concrete action 2"]
+    }
+  ]
 }`;
   }
 
@@ -290,12 +423,12 @@ G. **Talent Development Focus (1-2 items)**: Prioritized talents for focused dev
 }`;
 }
 
-export function buildWellbeingPrompt(text: string, keywords: string[]): string {
+export function buildMentalMonitoringPrompt(text: string, keywords: string[]): string {
   const keywordInfo = keywords.length > 0
     ? `Detected keywords: ${keywords.join(", ")}`
     : "No flagged keywords detected";
 
-  return `Review the following text for potential wellbeing signals (NOT a diagnosis):
+  return `Review the following text for potential mental health signals (NOT a diagnosis):
 
 **Text:**
 ${text.slice(0, 2000)}
@@ -310,7 +443,7 @@ ${keywordInfo}
 - Use cautious, supportive wording.
 
 **Evaluate the level:**
-- "none": No notable wellbeing signals.
+- "none": No notable mental health signals.
 - "mild": Light indicators (e.g., stress, uncertainty).
 - "flag": Stronger signals requiring attention.
 

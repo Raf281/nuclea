@@ -29,18 +29,20 @@ function progressColor(score: number): string {
 
 export function ScoreCards({ scores, justifications }: ScoreCardsProps) {
   return (
-    <div className="grid gap-3 sm:grid-cols-5">
+    <div className="space-y-3">
       {DIMENSIONS.map(({ key, label }) => (
-        <div key={key} className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{label}</span>
-            <span className={cn("text-lg font-bold", scoreColor(scores[key]))}>
-              {scores[key]}
-            </span>
+        <div key={key} className="space-y-1.5">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide shrink-0">{label}</span>
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <Progress value={(scores[key] / 5) * 100} className={cn("h-2 flex-1", progressColor(scores[key]))} />
+              <span className={cn("text-sm font-bold tabular-nums shrink-0 w-8 text-right", scoreColor(scores[key]))}>
+                {scores[key]}<span className="text-muted-foreground font-normal">/5</span>
+              </span>
+            </div>
           </div>
-          <Progress value={(scores[key] / 5) * 100} className={cn("h-1.5", progressColor(scores[key]))} />
           {justifications?.[key] && (
-            <p className="text-xs text-muted-foreground leading-relaxed">{justifications[key]}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed pl-0">{justifications[key]}</p>
           )}
         </div>
       ))}

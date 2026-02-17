@@ -34,8 +34,8 @@ export async function POST(req: NextRequest) {
 
         try {
           const result = await analyzeText(body.text, {
-            isElementary: body.is_elementary,
-            wellbeingEnabled: body.wellbeing_enabled,
+            analysisMode: body.analysis_mode,
+            mentalMonitoringEnabled: body.mental_monitoring_enabled,
             onProgress: (percent, message) => {
               sendEvent({ type: "progress", percent, message });
             },

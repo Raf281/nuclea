@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AnalysisResultView } from "@/components/analysis/analysis-result-view";
 import { DEMO_STUDENTS } from "@/lib/demo-data";
 import type { AnalysisResult, AnalysisMode, WorkType } from "@/lib/types";
-import { Upload, FileText, Loader2, CheckCircle } from "lucide-react";
+import { Upload, FileText, Loader2, CheckCircle, X, File } from "lucide-react";
 
 type AnalysisStep = "input" | "analyzing" | "complete";
 
@@ -21,12 +21,71 @@ export default function AnalyzePage() {
   const [studentId, setStudentId] = useState("");
   const [workTitle, setWorkTitle] = useState("");
   const [workType, setWorkType] = useState<WorkType>("essay");
-  const [isElementary, setIsElementary] = useState(false);
-  const [wellbeingEnabled, setWellbeingEnabled] = useState(false);
+  const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("highschool");
+  const [mentalMonitoringEnabled, setMentalMonitoringEnabled] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState("");
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<{ name: string; size: number } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle file reading
+  const handleFileRead = useCallback((file: globalThis.File) => {
+    setUploadedFile({ name: file.name, size: file.size });
+
+    if (file.type === "text/plain" || file.name.endsWith(".txt") || file.name.endsWith(".md")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        setText(content);
+      };
+      reader.readAsText(file);
+    } else if (file.type === "text/csv" || file.name.endsWith(".csv")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        setText(content);
+      };
+      reader.readAsText(file);
+    } else {
+      // For PDF, DOCX, images: show file info, text extraction coming later
+      setText(`[File uploaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]\n\nAutomatic text extraction for ${file.type || "this file type"} is coming soon.\nFor now, please paste the text content below.`);
+    }
+  }, []);
+
+  // Drag & drop handlers
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileRead(file);
+  }, [handleFileRead]);
+
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFileRead(file);
+  }, [handleFileRead]);
+
+  const clearFile = useCallback(() => {
+    setUploadedFile(null);
+    setText("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, []);
 
   const canAnalyze = text.trim().length >= 20 && studentId && workTitle.trim();
 
@@ -46,8 +105,8 @@ export default function AnalyzePage() {
           work_title: workTitle,
           work_type: workType,
           text,
-          is_elementary: isElementary,
-          wellbeing_enabled: wellbeingEnabled,
+          analysis_mode: analysisMode,
+          mental_monitoring_enabled: mentalMonitoringEnabled,
         }),
       });
 
@@ -102,6 +161,8 @@ export default function AnalyzePage() {
     setResult(null);
     setProgress(0);
     setError("");
+    setUploadedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   return (
@@ -172,18 +233,71 @@ export default function AnalyzePage() {
               </CardContent>
             </Card>
 
-            {/* Text Input */}
+            {/* Text Input / File Upload */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">3. Student&apos;s Work</CardTitle>
-                <CardDescription>Paste the text or upload a file</CardDescription>
+                <CardDescription>Drag &amp; drop a file, upload, or paste text directly</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Drag & Drop Zone */}
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`
+                    relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-6 cursor-pointer transition-colors
+                    ${isDragOver
+                      ? "border-primary bg-primary/5"
+                      : "border-input hover:border-primary/50 hover:bg-muted/30"
+                    }
+                  `}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".txt,.md,.csv,.pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <Upload className={`h-8 w-8 ${isDragOver ? "text-primary" : "text-muted-foreground"}`} />
+                  <div className="text-center">
+                    <p className="text-sm font-medium">
+                      {isDragOver ? "Drop file here" : "Drop file here or click to browse"}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      TXT, PDF, DOCX, Images — Max 10 MB
+                    </p>
+                  </div>
+                </div>
+
+                {/* Uploaded file indicator */}
+                {uploadedFile && (
+                  <div className="flex items-center gap-3 rounded-lg bg-muted/50 border px-3 py-2">
+                    <File className="h-4 w-4 text-primary shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{uploadedFile.name}</p>
+                      <p className="text-xs text-muted-foreground">{(uploadedFile.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                    <button onClick={(e) => { e.stopPropagation(); clearFile(); }} className="text-muted-foreground hover:text-foreground">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Divider */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
+                  <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">or paste text</span></div>
+                </div>
+
+                {/* Textarea */}
                 <textarea
                   placeholder="Paste the student's work here... (minimum 20 characters)"
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  rows={10}
+                  rows={8}
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring resize-y font-mono"
                 />
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -201,26 +315,39 @@ export default function AnalyzePage() {
                 <CardTitle className="text-base">4. Analysis Options</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Elementary Mode</p>
-                    <p className="text-xs text-muted-foreground">
-                      Age-appropriate analysis for elementary school (6-12)
-                    </p>
-                  </div>
-                  <Switch checked={isElementary} onCheckedChange={setIsElementary} />
+                <div>
+                  <p className="text-sm font-medium mb-1.5">Education Level</p>
+                  <Select value={analysisMode} onValueChange={(v) => setAnalysisMode(v as AnalysisMode)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="elementary">
+                        Elementary School (Ages 6-12)
+                      </SelectItem>
+                      <SelectItem value="highschool">
+                        High School (Ages 13-18)
+                      </SelectItem>
+                      <SelectItem value="university">
+                        University (Ages 18+)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    Adjusts analysis criteria and language to the appropriate level
+                  </p>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium">Wellbeing Signals</p>
+                      <p className="text-sm font-medium">Mental Monitoring</p>
                       <Badge variant="secondary" className="text-[10px]">Beta</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Screen for potential wellbeing indicators (opt-in)
+                      Screen for potential mental health indicators (opt-in)
                     </p>
                   </div>
-                  <Switch checked={wellbeingEnabled} onCheckedChange={setWellbeingEnabled} />
+                  <Switch checked={mentalMonitoringEnabled} onCheckedChange={setMentalMonitoringEnabled} />
                 </div>
               </CardContent>
             </Card>
@@ -262,7 +389,7 @@ export default function AnalyzePage() {
                 <div>
                   <p className="text-sm font-medium">Analysis Complete</p>
                   <p className="text-xs text-muted-foreground">
-                    &ldquo;{workTitle}&rdquo; — {isElementary ? "Elementary" : "Default"} Mode
+                    &ldquo;{workTitle}&rdquo; — {analysisMode === "elementary" ? "Elementary" : analysisMode === "highschool" ? "High School" : "University"} Mode
                   </p>
                 </div>
                 <Button variant="outline" size="sm" className="ml-auto" onClick={handleReset}>
@@ -273,7 +400,7 @@ export default function AnalyzePage() {
 
             <AnalysisResultView
               result={result}
-              mode={isElementary ? "elementary" : "default"}
+              mode={analysisMode}
             />
           </>
         )}

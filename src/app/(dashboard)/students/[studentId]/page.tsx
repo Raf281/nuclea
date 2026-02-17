@@ -185,7 +185,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ studen
                               <>
                                 <span>&middot;</span>
                                 <Badge variant={a.mode === "elementary" ? "secondary" : "outline"} className="text-[10px]">
-                                  {a.mode === "elementary" ? "Elementary" : "Default"}
+                                  {a.mode === "elementary" ? "Elementary" : a.mode === "highschool" ? "High School" : "University"}
                                 </Badge>
                               </>
                             )}

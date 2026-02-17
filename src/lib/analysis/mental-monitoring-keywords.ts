@@ -1,5 +1,5 @@
 // ============================================================================
-// Wellbeing Keyword Pre-Screening
+// Mental Monitoring Keyword Pre-Screening
 // Ported from legacy/analysis.py check_wellbeing_keywords()
 // Translated from German to English for English UI
 // ============================================================================
@@ -16,7 +16,7 @@ const FLAG_KEYWORDS = [
   "hurt myself", "end it all",
 ];
 
-export function checkWellbeingKeywords(text: string): string[] {
+export function checkMentalMonitoringKeywords(text: string): string[] {
   const textLower = text.toLowerCase();
   const found: string[] = [];
 
