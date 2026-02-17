@@ -86,6 +86,8 @@ nuclea/
 3. **Diese Datei aktualisieren** wenn sich der Projektstatus aendert
 4. **Deutsche Sprache** in der Kommunikation mit dem User
 5. **Code-Kommentare** auf Englisch
+6. **Session-Log Pflicht:** Bei jedem Session-Eintrag IMMER Datum UND Uhrzeit (UTC) angeben
+7. **Letzter Stand:** Am Ende jeder Session Datum+Uhrzeit des letzten Commits aktualisieren
 
 ---
 
@@ -98,12 +100,12 @@ nuclea/
 - Analyse-Pipeline mit Prompts implementiert
 - Demo-Daten angelegt
 
-### Session 2 (2026-02-17)
+### Session 2 (2026-02-17, Uhrzeit unbekannt)
 - Code von Branch `claude/review-project-repo-O1MzI` gerettet
 - Auf `claude/resume-session-ArKCr` gemergt und gepusht
 - CLAUDE.md angelegt fuer persistenten Kontext
 
-### Session 3 (2026-02-17)
+### Session 3 (2026-02-17, Uhrzeit unbekannt)
 - **Deployment:** Live auf Vercel unter nuclea-eight.vercel.app
 - **Dark Mode Fix:** ThemeToggle Hydration-Bug behoben (mounted state check), Dark-Mode CSS-Variablen verbessert (mehr Kontrast, tiefere Hintergruende)
 - **Logo Redesign:** Neues geometrisches Hexagon-Logo im Palantir-Stil (SVG) mit "NUCLEA Intelligence" Branding
@@ -113,7 +115,7 @@ nuclea/
 - **File Upload:** Drag & Drop Zone auf der Analyze-Seite implementiert — unterstuetzt TXT (direkt gelesen), PDF/DOCX/Images (vorbereitet fuer spaetere Text-Extraktion)
 - **Analyse-Result-View:** Talent-Tab komplett ueberarbeitet mit neuer Matrix + Development Roadmap
 
-### Session 4 (2026-02-17)
+### Session 4 (2026-02-17, ~19:00–20:24 UTC)
 - **Next.js Upgrade:** 15.1 → 16.1.6 (Vercel Security-Block behoben)
 - **tsconfig.json:** Fuer Next.js 16 Kompatibilitaet angepasst
 - **Wellbeing → Mental Monitoring:** Komplettes Renaming durchgefuehrt (Komponenten, Keywords, Prompts, Types, Sidebar)
@@ -158,4 +160,4 @@ nuclea/
 - Legacy-Code (Streamlit) liegt unter `/legacy/` als Referenz
 - **Deployment:** Vercel, Branch `claude/resume-session-ArKCr`
 - **Pull Request:** PR offen zum Merge nach `main` — nach Merge ist `main` der aktive Branch
-- **Letzter Stand:** Next.js 16.1.6, alle Features funktional, 22 Dateien geaendert seit main
+- **Letzter Stand (2026-02-17, 20:24 UTC):** Next.js 16.1.6, alle Features funktional, 22 Dateien geaendert seit main
