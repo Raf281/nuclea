@@ -38,8 +38,8 @@ nuclea/
 │   │   ├── layout.tsx         ← Root Layout
 │   │   └── page.tsx           ← Startseite (Redirect)
 │   ├── components/
-│   │   ├── analysis/          ← Analyse-Ergebnis-Ansicht, Rubric-Chart, Score-Cards
-│   │   ├── layout/            ← Sidebar, Header, Theme-Provider, Theme-Toggle
+│   │   ├── analysis/          ← Analyse-Ergebnis-Ansicht, Rubric-Chart, Score-Cards, Talent-Matrix, Wellbeing-Overview
+│   │   ├── layout/            ← Sidebar (Hexagon-Logo), Header, Theme-Provider, Theme-Toggle
 │   │   └── ui/                ← Wiederverwendbare UI-Komponenten (Button, Card, Badge, etc.)
 │   └── lib/
 │       ├── analysis/          ← Pipeline, Prompts, Wellbeing-Keywords
@@ -103,6 +103,16 @@ nuclea/
 - Auf `claude/resume-session-ArKCr` gemergt und gepusht
 - CLAUDE.md angelegt fuer persistenten Kontext
 
+### Session 3 (2026-02-17)
+- **Deployment:** Live auf Vercel unter nuclea-eight.vercel.app
+- **Dark Mode Fix:** ThemeToggle Hydration-Bug behoben (mounted state check), Dark-Mode CSS-Variablen verbessert (mehr Kontrast, tiefere Hintergruende)
+- **Logo Redesign:** Neues geometrisches Hexagon-Logo im Palantir-Stil (SVG) mit "NUCLEA Intelligence" Branding
+- **Score Breakdown Fix:** Zahlen-Overlap behoben — von 5-Spalten-Grid auf vertikale Liste umgestellt mit inline Progress-Bars
+- **Talent Matrix NEU:** Eigene Career Domain Fit Matrix Komponente (`talent-matrix.tsx`) — berechnet Karriere-Passung (Tech, Sciences, Humanities, Arts, Business, Law) basierend auf Rubric-Scores mit gewichteten Dimensionen, visuellen Balken und Score-Beitrag
+- **Wellbeing Assessment NEU:** Eigene Wellbeing-Overview Komponente (`wellbeing-overview.tsx`) — Signal-Level-Gauge, Assessment-Note, Empfohlene Aktionen, Disclaimer
+- **File Upload:** Drag & Drop Zone auf der Analyze-Seite implementiert — unterstuetzt TXT (direkt gelesen), PDF/DOCX/Images (vorbereitet fuer spaetere Text-Extraktion)
+- **Analyse-Result-View:** Talent-Tab komplett ueberarbeitet mit neuer Matrix + Development Roadmap
+
 ---
 
 ## Naechste Schritte / Offene TODOs
@@ -110,10 +120,24 @@ nuclea/
 - [ ] Datenbank-Anbindung (Supabase?)
 - [ ] Authentifizierung
 - [ ] Echte API-Integration (statt Demo-Daten)
-- [ ] File-Upload (PDF, DOCX) im Frontend
+- [x] File-Upload (Drag & Drop) im Frontend — MVP fertig, Text-Extraktion fuer PDF/DOCX/Images noch offen
+- [ ] PDF/DOCX Text-Extraktion (Server-seitig)
+- [ ] Image OCR Integration
+- [ ] Email-Eingang (school@nuclea.com → automatischer Import)
 - [ ] Schueler-Profil Erstellung ("Create Profile" Button)
 - [ ] Fortschritts-Tracking ueber Zeit
-- [ ] Deployment-Setup (Vercel?)
+- [x] Deployment-Setup (Vercel) — Live!
+- [ ] Custom Domain fuer Vercel
+- [ ] ANTHROPIC_API_KEY in Vercel Environment Variables setzen
+
+---
+
+## Produkt-Vision / Ideen
+
+- **Email-Upload:** Schueler schicken Arbeiten an school@nuclea.com → automatisch entpackt und verarbeitet
+- **Talent-Matrix:** Laengerfristig ueber mehrere Arbeiten hinweg aggregieren, nicht nur einzelne Analyse
+- **Fortschritts-Grafiken:** Zeitliche Entwicklung der Scores pro Schueler visualisieren
+- **Export:** PDF-Reports pro Schueler/Klasse generieren
 
 ---
 
@@ -122,3 +146,4 @@ nuclea/
 - `.env.example` zeigt benoetigte Umgebungsvariablen
 - DevContainer ist konfiguriert (Port 3000)
 - Legacy-Code (Streamlit) liegt unter `/legacy/` als Referenz
+- **Deployment:** Vercel, Branch `claude/resume-session-ArKCr`

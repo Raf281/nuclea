@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RubricChart } from "./rubric-chart";
 import { ScoreCards } from "./score-cards";
+import { TalentMatrix } from "./talent-matrix";
+import { WellbeingOverview } from "./wellbeing-overview";
 import type { AnalysisResult, AnalysisMode } from "@/lib/types";
 import {
   TrendingUp, TrendingDown, Brain,
@@ -169,37 +171,26 @@ export function AnalysisResultView({ result, mode }: AnalysisResultViewProps) {
 
       {/* Talent Tab */}
       <TabsContent value="talent" className="space-y-6">
-        {/* Talent Indicators */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="h-4 w-4" />
-              Talent Indicators
-              <Badge variant="secondary" className="text-[10px]">Beta</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {result.talent_indicators.map((t, i) => (
-                <Badge key={i} variant="outline" className="text-sm py-1 px-3">
-                  {t}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Career Domain Fit Matrix */}
+        {!isElementary && (
+          <TalentMatrix
+            scores={result.rubric.scores}
+            talentIndicators={result.talent_indicators}
+            matchingDomains={result.matching_domains}
+          />
+        )}
 
-        {/* Matching Domains / Learning Recommendations */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Target className="h-4 w-4" />
-              {isElementary ? "Learning Recommendations" : "Matching Domains"}
-              <Badge variant="secondary" className="text-[10px]">Beta</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isElementary ? (
+        {/* Learning Recommendations (Elementary) */}
+        {isElementary && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Target className="h-4 w-4" />
+                Learning Recommendations
+                <Badge variant="secondary" className="text-[10px]">Beta</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               <ol className="space-y-3">
                 {(result.learning_recommendations.length > 0
                   ? result.learning_recommendations
@@ -213,25 +204,39 @@ export function AnalysisResultView({ result, mode }: AnalysisResultViewProps) {
                   </li>
                 ))}
               </ol>
-            ) : (
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Talent Indicators (Elementary) */}
+        {isElementary && result.talent_indicators.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Sparkles className="h-4 w-4" />
+                Talent Indicators
+                <Badge variant="secondary" className="text-[10px]">Beta</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="flex flex-wrap gap-2">
-                {result.matching_domains.map((d, i) => (
-                  <Badge key={i} variant="default" className="text-sm py-1 px-3">
-                    {d}
+                {result.talent_indicators.map((t, i) => (
+                  <Badge key={i} variant="outline" className="text-sm py-1 px-3">
+                    {t}
                   </Badge>
                 ))}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Talent Development Focus (Default Mode only) */}
+        {/* Talent Development Focus (Default Mode) */}
         {!isElementary && result.talent_development_focus.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Target className="h-4 w-4" />
-                Talent Development Focus
+                Development Roadmap
                 <Badge variant="secondary" className="text-[10px]">Beta</Badge>
               </CardTitle>
             </CardHeader>
@@ -243,7 +248,7 @@ export function AnalysisResultView({ result, mode }: AnalysisResultViewProps) {
                   <ul className="space-y-1">
                     {focus.next_steps.map((step, j) => (
                       <li key={j} className="text-sm text-muted-foreground flex gap-2">
-                        <span className="text-primary">-</span>
+                        <span className="text-primary">→</span>
                         {step}
                       </li>
                     ))}
@@ -254,35 +259,9 @@ export function AnalysisResultView({ result, mode }: AnalysisResultViewProps) {
           </Card>
         )}
 
-        {/* Wellbeing */}
+        {/* Wellbeing Assessment */}
         {result.wellbeing && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Heart className="h-4 w-4" />
-                Wellbeing Signals
-                <Badge variant="secondary" className="text-[10px]">Beta</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2">
-                {result.wellbeing.level === "none" && (
-                  <Badge variant="success"><CheckCircle className="h-3 w-3 mr-1" /> None</Badge>
-                )}
-                {result.wellbeing.level === "mild" && (
-                  <Badge variant="warning"><Info className="h-3 w-3 mr-1" /> Mild</Badge>
-                )}
-                {result.wellbeing.level === "flag" && (
-                  <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" /> Flag</Badge>
-                )}
-              </div>
-              <p className="text-sm"><strong>Note:</strong> {result.wellbeing.note}</p>
-              <p className="text-sm"><strong>Next Step:</strong> {result.wellbeing.next_step}</p>
-              <p className="text-xs text-muted-foreground italic mt-2">
-                Disclaimer: Indicative, not diagnostic. All decisions must be made by qualified humans.
-              </p>
-            </CardContent>
-          </Card>
+          <WellbeingOverview wellbeing={result.wellbeing} />
         )}
       </TabsContent>
     </Tabs>

@@ -72,11 +72,35 @@ export function Sidebar() {
         {/* Logo */}
         <div className="flex h-16 items-center justify-between px-4">
           {!collapsed && (
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <span className="text-sm font-bold text-primary-foreground">N</span>
+            <Link href="/dashboard" className="flex items-center gap-2.5 group">
+              {/* Geometric hexagon logo inspired by Palantir */}
+              <div className="relative flex h-9 w-9 items-center justify-center">
+                <svg viewBox="0 0 40 40" className="h-9 w-9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Outer hexagon */}
+                  <path
+                    d="M20 2 L36 11 L36 29 L20 38 L4 29 L4 11 Z"
+                    className="stroke-primary fill-primary/10"
+                    strokeWidth="1.5"
+                  />
+                  {/* Inner diamond */}
+                  <path
+                    d="M20 8 L30 20 L20 32 L10 20 Z"
+                    className="fill-primary/20 stroke-primary"
+                    strokeWidth="1"
+                  />
+                  {/* Center lines radiating outward */}
+                  <line x1="20" y1="2" x2="20" y2="14" className="stroke-primary" strokeWidth="1" opacity="0.5" />
+                  <line x1="20" y1="26" x2="20" y2="38" className="stroke-primary" strokeWidth="1" opacity="0.5" />
+                  <line x1="4" y1="20" x2="14" y2="20" className="stroke-primary" strokeWidth="1" opacity="0.5" />
+                  <line x1="26" y1="20" x2="36" y2="20" className="stroke-primary" strokeWidth="1" opacity="0.5" />
+                  {/* Center dot */}
+                  <circle cx="20" cy="20" r="2.5" className="fill-primary" />
+                </svg>
               </div>
-              <span className="text-lg font-semibold tracking-tight">NUCLEA</span>
+              <div className="flex flex-col">
+                <span className="text-[15px] font-bold tracking-[0.25em] uppercase leading-none">NUCLEA</span>
+                <span className="text-[9px] tracking-[0.15em] text-muted-foreground uppercase mt-0.5">Intelligence</span>
+              </div>
             </Link>
           )}
           <Button
