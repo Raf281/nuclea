@@ -90,7 +90,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-3 ml-4">
                       <Badge variant={a.mode === "elementary" ? "secondary" : "outline"} className="text-[10px]">
-                        {a.mode === "elementary" ? "Elem" : "Default"}
+                        {a.mode === "elementary" ? "Elem" : a.mode === "highschool" ? "HS" : "Uni"}
                       </Badge>
                       <ScoreColor score={a.avg_score} />
                     </div>

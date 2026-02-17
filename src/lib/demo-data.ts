@@ -84,7 +84,7 @@ const DEMO_ANALYSIS_RESULT_DEFAULT: AnalysisResult = {
       next_steps: ["Engage in structured debate forums focusing on evidence-based argumentation", "Conduct evidence-based research projects using primary sources"],
     },
   ],
-  wellbeing: null,
+  mental_monitoring: null,
 };
 
 const DEMO_ANALYSIS_RESULT_ELEMENTARY: AnalysisResult = {
@@ -122,7 +122,7 @@ const DEMO_ANALYSIS_RESULT_ELEMENTARY: AnalysisResult = {
     "History project about favorite football club: Research club history, connect to historical events",
   ],
   talent_development_focus: [],
-  wellbeing: null,
+  mental_monitoring: null,
 };
 
 // ---------- Demo Works with Analyses ----------
@@ -134,10 +134,10 @@ export const DEMO_WORKS: (Work & { student_name: string })[] = [
     file_name: null, word_count: 1250, submitted_by: "user-2", created_at: "2026-02-10T14:30:00Z",
     student_name: "Emma Thompson",
     analysis: {
-      id: "analysis-1", work_id: "work-1", mode: "default",
+      id: "analysis-1", work_id: "work-1", mode: "university",
       score_structure: 4, score_clarity: 3, score_evidence: 4, score_originality: 3, score_coherence: 4,
       result_json: DEMO_ANALYSIS_RESULT_DEFAULT,
-      wellbeing_enabled: false, wellbeing_level: null, talent_json: null,
+      mental_monitoring_enabled: false, mental_monitoring_level: null, talent_json: null,
       llm_model: "claude-sonnet-4-20250514", processing_time_ms: 12340, created_at: "2026-02-10T14:30:00Z",
     },
   },
@@ -147,10 +147,10 @@ export const DEMO_WORKS: (Work & { student_name: string })[] = [
     file_name: null, word_count: 980, submitted_by: "user-2", created_at: "2026-01-25T09:15:00Z",
     student_name: "Emma Thompson",
     analysis: {
-      id: "analysis-2", work_id: "work-2", mode: "default",
+      id: "analysis-2", work_id: "work-2", mode: "university",
       score_structure: 4, score_clarity: 4, score_evidence: 4, score_originality: 4, score_coherence: 4,
       result_json: { ...DEMO_ANALYSIS_RESULT_DEFAULT, rubric: { scores: { structure: 4, clarity: 4, evidence: 4, originality: 4, coherence: 4 }, justifications: DEMO_ANALYSIS_RESULT_DEFAULT.rubric.justifications } },
-      wellbeing_enabled: false, wellbeing_level: null, talent_json: null,
+      mental_monitoring_enabled: false, mental_monitoring_level: null, talent_json: null,
       llm_model: "claude-sonnet-4-20250514", processing_time_ms: 11200, created_at: "2026-01-25T09:15:00Z",
     },
   },
@@ -163,7 +163,7 @@ export const DEMO_WORKS: (Work & { student_name: string })[] = [
       id: "analysis-3", work_id: "work-3", mode: "elementary",
       score_structure: 3, score_clarity: 3, score_evidence: 2, score_originality: 4, score_coherence: 3,
       result_json: DEMO_ANALYSIS_RESULT_ELEMENTARY,
-      wellbeing_enabled: false, wellbeing_level: null, talent_json: null,
+      mental_monitoring_enabled: false, mental_monitoring_level: null, talent_json: null,
       llm_model: "claude-sonnet-4-20250514", processing_time_ms: 8500, created_at: "2026-02-11T10:00:00Z",
     },
   },
@@ -177,11 +177,11 @@ export const DEMO_DASHBOARD_STATS: DashboardStats = {
   total_classes: DEMO_CLASSES.length,
   avg_overall_score: 3.5,
   recent_analyses: [
-    { id: "analysis-5", student_name: "Mia Johnson", work_title: "World War II: Causes and Consequences", avg_score: 3.5, created_at: "2026-02-14T13:20:00Z", mode: "default" },
+    { id: "analysis-5", student_name: "Mia Johnson", work_title: "World War II: Causes and Consequences", avg_score: 3.5, created_at: "2026-02-14T13:20:00Z", mode: "university" },
     { id: "analysis-4", student_name: "Lucas Garcia", work_title: "My Family", avg_score: 2.7, created_at: "2026-02-13T14:30:00Z", mode: "elementary" },
-    { id: "analysis-6", student_name: "Sofia Martinez", work_title: "Shakespeare's Influence on Modern Literature", avg_score: 4.3, created_at: "2026-02-12T09:00:00Z", mode: "default" },
+    { id: "analysis-6", student_name: "Sofia Martinez", work_title: "Shakespeare's Influence on Modern Literature", avg_score: 4.3, created_at: "2026-02-12T09:00:00Z", mode: "university" },
     { id: "analysis-3", student_name: "Olivia Brown", work_title: "My Favorite Things", avg_score: 3.0, created_at: "2026-02-11T10:00:00Z", mode: "elementary" },
-    { id: "analysis-1", student_name: "Emma Thompson", work_title: "The Fall of the Roman Empire", avg_score: 3.6, created_at: "2026-02-10T14:30:00Z", mode: "default" },
+    { id: "analysis-1", student_name: "Emma Thompson", work_title: "The Fall of the Roman Empire", avg_score: 3.6, created_at: "2026-02-10T14:30:00Z", mode: "university" },
   ],
 };
 

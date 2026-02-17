@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "tailwindcss/theme" layer(theme);
-@import "tailwindcss/utilities" layer(utilities);
 
 @plugin "tailwindcss-animate";
 
@@ -46,7 +44,7 @@
   --color-warning-foreground: oklch(0.205 0 0);
 }
 
-.dark {
+:root.dark {
   --color-background: oklch(0.10 0.005 264);
   --color-foreground: oklch(0.95 0 0);
   --color-card: oklch(0.14 0.008 264);

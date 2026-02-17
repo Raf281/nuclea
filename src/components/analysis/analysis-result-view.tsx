@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RubricChart } from "./rubric-chart";
 import { ScoreCards } from "./score-cards";
 import { TalentMatrix } from "./talent-matrix";
-import { WellbeingOverview } from "./wellbeing-overview";
+import { MentalMonitoringOverview } from "./mental-monitoring-overview";
 import type { AnalysisResult, AnalysisMode } from "@/lib/types";
 import {
   TrendingUp, TrendingDown, Brain,
@@ -21,6 +21,7 @@ interface AnalysisResultViewProps {
 
 export function AnalysisResultView({ result, mode }: AnalysisResultViewProps) {
   const isElementary = mode === "elementary";
+  const isUniversity = mode === "university";
 
   return (
     <Tabs defaultValue="overview" className="space-y-6">
@@ -172,7 +173,7 @@ export function AnalysisResultView({ result, mode }: AnalysisResultViewProps) {
       {/* Talent Tab */}
       <TabsContent value="talent" className="space-y-6">
         {/* Career Domain Fit Matrix */}
-        {!isElementary && (
+        {(isUniversity || mode === "highschool") && (
           <TalentMatrix
             scores={result.rubric.scores}
             talentIndicators={result.talent_indicators}
@@ -231,7 +232,7 @@ export function AnalysisResultView({ result, mode }: AnalysisResultViewProps) {
         )}
 
         {/* Talent Development Focus (Default Mode) */}
-        {!isElementary && result.talent_development_focus.length > 0 && (
+        {(isUniversity || mode === "highschool") && result.talent_development_focus.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -260,8 +261,8 @@ export function AnalysisResultView({ result, mode }: AnalysisResultViewProps) {
         )}
 
         {/* Wellbeing Assessment */}
-        {result.wellbeing && (
-          <WellbeingOverview wellbeing={result.wellbeing} />
+        {result.mental_monitoring && (
+          <MentalMonitoringOverview monitoring={result.mental_monitoring} />
         )}
       </TabsContent>
     </Tabs>

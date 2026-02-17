@@ -8,10 +8,10 @@ import {
   buildRubricPrompt,
   buildProfilePrompt,
   buildTalentPrompt,
-  buildWellbeingPrompt,
+  buildMentalMonitoringPrompt,
 } from "./prompts";
-import { checkWellbeingKeywords } from "./wellbeing-keywords";
-import type { AnalysisResult, RubricScores, TalentFocus, WellbeingResult } from "@/lib/types";
+import { checkMentalMonitoringKeywords } from "./mental-monitoring-keywords";
+import type { AnalysisResult, AnalysisMode, RubricScores, TalentFocus, MentalMonitoringResult } from "@/lib/types";
 
 const DEFAULT_SCORES: RubricScores = {
   structure: 3, clarity: 3, evidence: 3, originality: 3, coherence: 3,
@@ -48,12 +48,12 @@ function parseJSON<T>(raw: string, fallback: T): T {
 export async function analyzeText(
   text: string,
   options: {
-    isElementary?: boolean;
-    wellbeingEnabled?: boolean;
+    analysisMode?: AnalysisMode;
+    mentalMonitoringEnabled?: boolean;
     onProgress?: (percent: number, message: string) => void;
   } = {}
 ): Promise<AnalysisResult> {
-  const { isElementary = false, wellbeingEnabled = false, onProgress } = options;
+  const { analysisMode = "highschool", mentalMonitoringEnabled = false, onProgress } = options;
   const startTime = Date.now();
 
   if (!text || text.trim().length < 20) {
@@ -62,7 +62,7 @@ export async function analyzeText(
 
   // Step 1: Rubric Scores
   onProgress?.(20, "Evaluating rubric scores...");
-  const rubricPrompt = buildRubricPrompt(text, isElementary);
+  const rubricPrompt = buildRubricPrompt(text, analysisMode);
   const rubricRaw = await callLLM(rubricPrompt);
   const rubricData = parseJSON<{ scores?: RubricScores; justifications?: Record<string, string> }>(
     rubricRaw,
@@ -73,7 +73,7 @@ export async function analyzeText(
 
   // Step 2: Profile
   onProgress?.(50, "Building cognitive profile...");
-  const profilePrompt = buildProfilePrompt(scores, text, isElementary);
+  const profilePrompt = buildProfilePrompt(scores, text, analysisMode);
   const profileRaw = await callLLM(profilePrompt);
   const profileData = parseJSON<{
     strengths?: string[];
@@ -91,7 +91,7 @@ export async function analyzeText(
     },
     scores,
     text,
-    isElementary
+    analysisMode
   );
   const talentRaw = await callLLM(talentPrompt);
   const talentData = parseJSON<{
@@ -101,14 +101,14 @@ export async function analyzeText(
     talent_development_focus?: TalentFocus[];
   }>(talentRaw, {});
 
-  // Step 4: Wellbeing (optional)
-  let wellbeingData: WellbeingResult | null = null;
-  if (wellbeingEnabled) {
-    onProgress?.(90, "Checking wellbeing signals...");
-    const keywords = checkWellbeingKeywords(text);
-    const wellbeingPrompt = buildWellbeingPrompt(text, keywords);
-    const wellbeingRaw = await callLLM(wellbeingPrompt);
-    wellbeingData = parseJSON<WellbeingResult>(wellbeingRaw, {
+  // Step 4: Mental Monitoring (optional)
+  let mentalMonitoringData: MentalMonitoringResult | null = null;
+  if (mentalMonitoringEnabled) {
+    onProgress?.(90, "Running mental monitoring check...");
+    const keywords = checkMentalMonitoringKeywords(text);
+    const monitoringPrompt = buildMentalMonitoringPrompt(text, keywords);
+    const monitoringRaw = await callLLM(monitoringPrompt);
+    mentalMonitoringData = parseJSON<MentalMonitoringResult>(monitoringRaw, {
       level: "none",
       note: "Assessment unavailable.",
       next_step: "Continue standard monitoring.",
@@ -132,6 +132,6 @@ export async function analyzeText(
     matching_domains: talentData.matching_domains || [],
     learning_recommendations: talentData.learning_recommendations || [],
     talent_development_focus: talentData.talent_development_focus || [],
-    wellbeing: wellbeingData,
+    mental_monitoring: mentalMonitoringData,
   };
 }

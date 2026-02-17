@@ -21,8 +21,8 @@ export default function AnalyzePage() {
   const [studentId, setStudentId] = useState("");
   const [workTitle, setWorkTitle] = useState("");
   const [workType, setWorkType] = useState<WorkType>("essay");
-  const [isElementary, setIsElementary] = useState(false);
-  const [wellbeingEnabled, setWellbeingEnabled] = useState(false);
+  const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("highschool");
+  const [mentalMonitoringEnabled, setMentalMonitoringEnabled] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -105,8 +105,8 @@ export default function AnalyzePage() {
           work_title: workTitle,
           work_type: workType,
           text,
-          is_elementary: isElementary,
-          wellbeing_enabled: wellbeingEnabled,
+          analysis_mode: analysisMode,
+          mental_monitoring_enabled: mentalMonitoringEnabled,
         }),
       });
 
@@ -315,26 +315,39 @@ export default function AnalyzePage() {
                 <CardTitle className="text-base">4. Analysis Options</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Elementary Mode</p>
-                    <p className="text-xs text-muted-foreground">
-                      Age-appropriate analysis for elementary school (6-12)
-                    </p>
-                  </div>
-                  <Switch checked={isElementary} onCheckedChange={setIsElementary} />
+                <div>
+                  <p className="text-sm font-medium mb-1.5">Education Level</p>
+                  <Select value={analysisMode} onValueChange={(v) => setAnalysisMode(v as AnalysisMode)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="elementary">
+                        Elementary School (Ages 6-12)
+                      </SelectItem>
+                      <SelectItem value="highschool">
+                        High School (Ages 13-18)
+                      </SelectItem>
+                      <SelectItem value="university">
+                        University (Ages 18+)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    Adjusts analysis criteria and language to the appropriate level
+                  </p>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium">Wellbeing Signals</p>
+                      <p className="text-sm font-medium">Mental Monitoring</p>
                       <Badge variant="secondary" className="text-[10px]">Beta</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Screen for potential wellbeing indicators (opt-in)
+                      Screen for potential mental health indicators (opt-in)
                     </p>
                   </div>
-                  <Switch checked={wellbeingEnabled} onCheckedChange={setWellbeingEnabled} />
+                  <Switch checked={mentalMonitoringEnabled} onCheckedChange={setMentalMonitoringEnabled} />
                 </div>
               </CardContent>
             </Card>
@@ -376,7 +389,7 @@ export default function AnalyzePage() {
                 <div>
                   <p className="text-sm font-medium">Analysis Complete</p>
                   <p className="text-xs text-muted-foreground">
-                    &ldquo;{workTitle}&rdquo; — {isElementary ? "Elementary" : "Default"} Mode
+                    &ldquo;{workTitle}&rdquo; — {analysisMode === "elementary" ? "Elementary" : analysisMode === "highschool" ? "High School" : "University"} Mode
                   </p>
                 </div>
                 <Button variant="outline" size="sm" className="ml-auto" onClick={handleReset}>
@@ -387,7 +400,7 @@ export default function AnalyzePage() {
 
             <AnalysisResultView
               result={result}
-              mode={isElementary ? "elementary" : "default"}
+              mode={analysisMode}
             />
           </>
         )}
