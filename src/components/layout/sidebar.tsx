@@ -37,8 +37,8 @@ const NAV_ITEMS = [
   {
     group: "Beta",
     items: [
-      { label: "Talent Matching", href: "/students", icon: Sparkles, beta: true },
-      { label: "Wellbeing", href: "/students", icon: Heart, beta: true },
+      { label: "Talent Matching", href: "/talent-matching", icon: Sparkles, beta: true },
+      { label: "Mental Monitoring", href: "/mental-monitoring", icon: Heart, beta: true },
     ],
   },
   {
