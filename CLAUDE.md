@@ -1,0 +1,124 @@
+# CLAUDE.md – Projekt-Kontext fuer Claude Code Sessions
+
+> Diese Datei dient als persistenter Kontext zwischen Claude Code Sessions.
+> Sie ist NICHT Teil der Software und wird via .gitignore ausgeschlossen.
+
+---
+
+## Projekt: NUCLEA
+
+**Beschreibung:** Objektives Bewertungssystem fuer akademische Arbeiten mit Talent-Profil-Erstellung und Entwicklungsplaenen.
+
+**Zielgruppe:** Lehrer, Schulleiter, Admins
+
+**Version:** MVP (V0.1)
+
+---
+
+## Tech Stack
+
+- **Framework:** Next.js 15.1 (App Router)
+- **Sprache:** TypeScript
+- **UI:** Tailwind CSS v4, Radix UI, Lucide Icons, Recharts
+- **LLM:** Anthropic SDK (Claude), alternativ OpenAI
+- **Themes:** next-themes (Dark/Light Mode)
+- **Legacy:** Streamlit-Version unter `/legacy/`
+
+---
+
+## Projektstruktur
+
+```
+nuclea/
+├── CLAUDE.md                  ← Diese Datei (Kontext fuer Claude)
+├── src/
+│   ├── app/
+│   │   ├── (dashboard)/       ← Hauptseiten (Dashboard, Analyze, Classes, Students, Settings)
+│   │   ├── api/analyze/       ← API Route fuer Analyse
+│   │   ├── layout.tsx         ← Root Layout
+│   │   └── page.tsx           ← Startseite (Redirect)
+│   ├── components/
+│   │   ├── analysis/          ← Analyse-Ergebnis-Ansicht, Rubric-Chart, Score-Cards
+│   │   ├── layout/            ← Sidebar, Header, Theme-Provider, Theme-Toggle
+│   │   └── ui/                ← Wiederverwendbare UI-Komponenten (Button, Card, Badge, etc.)
+│   └── lib/
+│       ├── analysis/          ← Pipeline, Prompts, Wellbeing-Keywords
+│       ├── demo-data.ts       ← Demo-Daten fuer Entwicklung
+│       ├── types.ts           ← Alle TypeScript-Typen
+│       └── utils.ts           ← Hilfsfunktionen
+├── legacy/                    ← Alte Streamlit-Version (app.py, analysis.py)
+├── package.json
+├── tsconfig.json
+├── next.config.ts
+└── .env.example
+```
+
+---
+
+## Kernfeatures (implementiert)
+
+1. **Dashboard** – Uebersicht mit Stats (Schueler, Analysen, Klassen, Durchschnitt)
+2. **Analyse-Seite** – Text einfuegen/hochladen → LLM-basierte Bewertung
+3. **Rubrik-Bewertung** – 5 Dimensionen (Struktur, Klarheit, Evidenz, Originalitaet, Kohaerenz), je 0-5
+4. **Kognitives Profil** – Staerken, Wachstumsbereiche, kognitives Muster
+5. **Talent-Identifikation** – Indikatoren, passende Domaenen, Entwicklungsfokus
+6. **Wellbeing-Signale** – Optional, Keyword-basiert + LLM
+7. **Klassen-Verwaltung** – Klassen anlegen und verwalten
+8. **Schueler-Profile** – Detail-Ansicht mit Analyse-Historie
+9. **Einstellungen** – API-Key, Modell, Modus
+10. **Dark/Light Mode** – Theme-Toggle
+
+---
+
+## Datenmodelle (src/lib/types.ts)
+
+- `School`, `UserProfile` (admin/principal/teacher)
+- `ClassData`, `Student`, `Work`, `Analysis`
+- `AnalysisResult` mit `RubricResult`, `TalentFocus`, `WellbeingResult`
+- `DashboardStats`, `RecentAnalysis`
+
+---
+
+## Wichtige Regeln fuer Claude
+
+1. **IMMER nach jedem groesseren Feature committen UND pushen** – nie warten bis Session-Ende
+2. **Zwischen-Commits** nach ca. 15-20 Minuten Arbeit oder nach jedem abgeschlossenen Feature
+3. **Diese Datei aktualisieren** wenn sich der Projektstatus aendert
+4. **Deutsche Sprache** in der Kommunikation mit dem User
+5. **Code-Kommentare** auf Englisch
+
+---
+
+## Session-Log
+
+### Session 1 (Datum unbekannt)
+- Kompletter Umbau von Streamlit → Next.js
+- Dashboard, Analyse, Klassen, Schueler, Einstellungen angelegt
+- UI-Komponenten erstellt (Sidebar, Header, Cards, etc.)
+- Analyse-Pipeline mit Prompts implementiert
+- Demo-Daten angelegt
+
+### Session 2 (2026-02-17)
+- Code von Branch `claude/review-project-repo-O1MzI` gerettet
+- Auf `claude/resume-session-ArKCr` gemergt und gepusht
+- CLAUDE.md angelegt fuer persistenten Kontext
+
+---
+
+## Naechste Schritte / Offene TODOs
+
+- [ ] Datenbank-Anbindung (Supabase?)
+- [ ] Authentifizierung
+- [ ] Echte API-Integration (statt Demo-Daten)
+- [ ] File-Upload (PDF, DOCX) im Frontend
+- [ ] Schueler-Profil Erstellung ("Create Profile" Button)
+- [ ] Fortschritts-Tracking ueber Zeit
+- [ ] Deployment-Setup (Vercel?)
+
+---
+
+## Hinweise
+
+- `.env.example` zeigt benoetigte Umgebungsvariablen
+- DevContainer ist konfiguriert (Port 3000)
+- Legacy-Code (Streamlit) liegt unter `/legacy/` als Referenz
