@@ -17,7 +17,7 @@
 
 ## Tech Stack
 
-- **Framework:** Next.js 15.1 (App Router)
+- **Framework:** Next.js 16.1.6 (App Router)
 - **Sprache:** TypeScript
 - **UI:** Tailwind CSS v4, Radix UI, Lucide Icons, Recharts
 - **LLM:** Anthropic SDK (Claude), alternativ OpenAI
@@ -33,16 +33,16 @@ nuclea/
 ├── CLAUDE.md                  ← Diese Datei (Kontext fuer Claude)
 ├── src/
 │   ├── app/
-│   │   ├── (dashboard)/       ← Hauptseiten (Dashboard, Analyze, Classes, Students, Settings)
+│   │   ├── (dashboard)/       ← Hauptseiten (Dashboard, Analyze, Classes, Students, Settings, Mental-Monitoring, Talent-Matching)
 │   │   ├── api/analyze/       ← API Route fuer Analyse
 │   │   ├── layout.tsx         ← Root Layout
 │   │   └── page.tsx           ← Startseite (Redirect)
 │   ├── components/
-│   │   ├── analysis/          ← Analyse-Ergebnis-Ansicht, Rubric-Chart, Score-Cards, Talent-Matrix, Wellbeing-Overview
+│   │   ├── analysis/          ← Analyse-Ergebnis-Ansicht, Rubric-Chart, Score-Cards, Talent-Matrix, Mental-Monitoring-Overview
 │   │   ├── layout/            ← Sidebar (Hexagon-Logo), Header, Theme-Provider, Theme-Toggle
 │   │   └── ui/                ← Wiederverwendbare UI-Komponenten (Button, Card, Badge, etc.)
 │   └── lib/
-│       ├── analysis/          ← Pipeline, Prompts, Wellbeing-Keywords
+│       ├── analysis/          ← Pipeline, Prompts, Mental-Monitoring-Keywords
 │       ├── demo-data.ts       ← Demo-Daten fuer Entwicklung
 │       ├── types.ts           ← Alle TypeScript-Typen
 │       └── utils.ts           ← Hilfsfunktionen
@@ -62,7 +62,7 @@ nuclea/
 3. **Rubrik-Bewertung** – 5 Dimensionen (Struktur, Klarheit, Evidenz, Originalitaet, Kohaerenz), je 0-5
 4. **Kognitives Profil** – Staerken, Wachstumsbereiche, kognitives Muster
 5. **Talent-Identifikation** – Indikatoren, passende Domaenen, Entwicklungsfokus
-6. **Wellbeing-Signale** – Optional, Keyword-basiert + LLM
+6. **Mental Monitoring** – Optional, Keyword-basiert + LLM (umbenannt von Wellbeing)
 7. **Klassen-Verwaltung** – Klassen anlegen und verwalten
 8. **Schueler-Profile** – Detail-Ansicht mit Analyse-Historie
 9. **Einstellungen** – API-Key, Modell, Modus
@@ -113,6 +113,16 @@ nuclea/
 - **File Upload:** Drag & Drop Zone auf der Analyze-Seite implementiert — unterstuetzt TXT (direkt gelesen), PDF/DOCX/Images (vorbereitet fuer spaetere Text-Extraktion)
 - **Analyse-Result-View:** Talent-Tab komplett ueberarbeitet mit neuer Matrix + Development Roadmap
 
+### Session 4 (2026-02-17)
+- **Next.js Upgrade:** 15.1 → 16.1.6 (Vercel Security-Block behoben)
+- **tsconfig.json:** Fuer Next.js 16 Kompatibilitaet angepasst
+- **Wellbeing → Mental Monitoring:** Komplettes Renaming durchgefuehrt (Komponenten, Keywords, Prompts, Types, Sidebar)
+- **3-Level Analysis Mode:** Analyse-Tiefe konfigurierbar (Quick/Standard/Deep) auf der Analyze-Seite
+- **Neue Beta-Seiten:** Mental Monitoring (`/mental-monitoring`) und Talent Matching (`/talent-matching`) als eigenstaendige Seiten in der Sidebar
+- **Dark Mode:** Weitere Verbesserungen an CSS-Variablen und Kontrast
+- **Pull Request:** PR erstellt zum Merge von `claude/resume-session-ArKCr` → `main`
+- **Letzte Commits:** df3ccfb → bcfdbf5 (5 Commits in dieser Session)
+
 ---
 
 ## Naechste Schritte / Offene TODOs
@@ -147,3 +157,5 @@ nuclea/
 - DevContainer ist konfiguriert (Port 3000)
 - Legacy-Code (Streamlit) liegt unter `/legacy/` als Referenz
 - **Deployment:** Vercel, Branch `claude/resume-session-ArKCr`
+- **Pull Request:** PR offen zum Merge nach `main` — nach Merge ist `main` der aktive Branch
+- **Letzter Stand:** Next.js 16.1.6, alle Features funktional, 22 Dateien geaendert seit main
