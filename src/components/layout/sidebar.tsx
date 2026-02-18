@@ -11,6 +11,7 @@ import {
   Settings,
   Sparkles,
   Heart,
+  LineChart,
   ChevronLeft,
   Menu,
 } from "lucide-react";
@@ -39,6 +40,7 @@ const NAV_ITEMS = [
     items: [
       { label: "Talent Matching", href: "/talent-matching", icon: Sparkles, beta: true },
       { label: "Mental Monitoring", href: "/mental-monitoring", icon: Heart, beta: true },
+      { label: "Individual Development", href: "/individual-development", icon: LineChart, beta: true },
     ],
   },
   {
