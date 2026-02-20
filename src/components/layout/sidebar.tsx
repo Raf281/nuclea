@@ -14,11 +14,13 @@ import {
   LineChart,
   ChevronLeft,
   Menu,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
   {
@@ -53,7 +55,29 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    try {
+      const raw = document.cookie
+        .split("; ")
+        .find((c) => c.startsWith("nuclea-user="));
+      if (raw) {
+        const data = JSON.parse(decodeURIComponent(raw.split("=").slice(1).join("=")));
+        setUserName(data.name || "");
+        setUserEmail(data.email || "");
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const handleLogout = useCallback(async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  }, [router]);
 
   return (
     <>
@@ -156,6 +180,28 @@ export function Sidebar() {
             </div>
           ))}
         </nav>
+
+        {/* User info & Logout */}
+        <div className="absolute bottom-0 left-0 right-0 border-t p-3">
+          {!collapsed ? (
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
+                {userName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-sm font-medium">{userName}</p>
+                <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
+              </div>
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={handleLogout} title="Sign out">
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button variant="ghost" size="icon" className="h-8 w-8 w-full" onClick={handleLogout} title="Sign out">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </aside>
     </>
   );
