@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,12 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
   Users, FileSearch, GraduationCap, TrendingUp,
-  ArrowRight, Clock,
+  ArrowRight,
 } from "lucide-react";
+import { SkeletonDashboard } from "@/components/ui/skeleton";
 import Link from "next/link";
-import { DEMO_DASHBOARD_STATS, DEMO_CLASSES } from "@/lib/demo-data";
-
-const stats = DEMO_DASHBOARD_STATS;
+import type { DashboardStats, ClassData } from "@/lib/types";
 
 function ScoreColor({ score }: { score: number }) {
   if (score >= 4) return <span className="text-green-500 font-semibold">{score.toFixed(1)}</span>;
@@ -21,6 +21,31 @@ function ScoreColor({ score }: { score: number }) {
 }
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [classes, setClasses] = useState<ClassData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/dashboard").then((r) => r.json()),
+      fetch("/api/classes").then((r) => r.json()),
+    ])
+      .then(([dashData, classData]) => {
+        setStats(dashData);
+        setClasses(classData);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading || !stats) {
+    return (
+      <>
+        <Header title="Dashboard" subtitle="Overview of your school's analytics" />
+        <SkeletonDashboard />
+      </>
+    );
+  }
+
   return (
     <>
       <Header title="Dashboard" subtitle="Overview of your school's analytics" />
@@ -108,7 +133,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {DEMO_CLASSES.map((cls) => (
+                {classes.map((cls) => (
                   <Link
                     key={cls.id}
                     href={`/classes/${cls.id}`}

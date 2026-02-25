@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { analyzeText } from "@/lib/analysis/pipeline";
+import { createWork, createAnalysis, isLiveMode } from "@/lib/data";
 import type { AnalyzeRequest } from "@/lib/types";
 
 export const maxDuration = 60;
@@ -33,6 +34,8 @@ export async function POST(req: NextRequest) {
         }
 
         try {
+          const startTime = Date.now();
+
           const result = await analyzeText(body.text, {
             analysisMode: body.analysis_mode,
             mentalMonitoringEnabled: body.mental_monitoring_enabled,
@@ -40,6 +43,43 @@ export async function POST(req: NextRequest) {
               sendEvent({ type: "progress", percent, message });
             },
           });
+
+          const processingTime = Date.now() - startTime;
+
+          // Persist to database in live mode
+          if (isLiveMode()) {
+            try {
+              // Get user from cookie
+              const userCookie = req.cookies.get("nuclea-user")?.value;
+              const user = userCookie ? JSON.parse(userCookie) : null;
+              const submittedBy = user?.id ?? "unknown";
+
+              // Create work entry
+              const work = await createWork({
+                student_id: body.student_id,
+                title: body.work_title,
+                work_type: body.work_type,
+                original_text: body.text,
+                word_count: body.text.split(/\s+/).length,
+                submitted_by: submittedBy,
+              });
+
+              // Create analysis entry
+              if (work) {
+                await createAnalysis({
+                  work_id: work.id,
+                  mode: body.analysis_mode,
+                  result,
+                  mental_monitoring_enabled: body.mental_monitoring_enabled,
+                  llm_model: "claude-sonnet-4-20250514",
+                  processing_time_ms: processingTime,
+                });
+              }
+            } catch {
+              // DB persistence failure is non-critical — result still returned
+              console.error("Failed to persist analysis to database");
+            }
+          }
 
           sendEvent({ type: "complete", result });
         } catch (err) {

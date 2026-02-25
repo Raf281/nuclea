@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AnalysisResultView } from "@/components/analysis/analysis-result-view";
-import { DEMO_STUDENTS } from "@/lib/demo-data";
-import type { AnalysisResult, AnalysisMode, WorkType } from "@/lib/types";
+import type { AnalysisResult, AnalysisMode, WorkType, Student } from "@/lib/types";
 import { Upload, FileText, Loader2, CheckCircle, X, File } from "lucide-react";
 
 type AnalysisStep = "input" | "analyzing" | "complete";
@@ -29,7 +28,16 @@ export default function AnalyzePage() {
   const [error, setError] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<{ name: string; size: number } | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load students from API
+  useEffect(() => {
+    fetch("/api/students")
+      .then((r) => r.json())
+      .then(setStudents)
+      .catch(() => {});
+  }, []);
 
   // Handle file reading
   const handleFileRead = useCallback((file: globalThis.File) => {
@@ -189,7 +197,7 @@ export default function AnalyzePage() {
                     <SelectValue placeholder="Choose a student..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {DEMO_STUDENTS.map((s) => (
+                    {students.map((s) => (
                       <SelectItem key={s.id} value={s.id}>
                         {s.first_name} {s.last_name} — {s.class_name}
                       </SelectItem>

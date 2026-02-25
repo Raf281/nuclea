@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState, useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,14 +9,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RubricChart } from "@/components/analysis/rubric-chart";
 import { ScoreCards } from "@/components/analysis/score-cards";
 import { AnalysisResultView } from "@/components/analysis/analysis-result-view";
-import { getDemoStudent, getDemoWorksByStudent } from "@/lib/demo-data";
-import { FileSearch, Calendar, ArrowRight, Download } from "lucide-react";
+import type { Student, Work } from "@/lib/types";
+import { FileSearch, Calendar, ArrowRight, Download, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 export default function StudentDetailPage({ params }: { params: Promise<{ studentId: string }> }) {
   const { studentId } = use(params);
-  const student = getDemoStudent(studentId);
-  const works = getDemoWorksByStudent(studentId);
+  const [student, setStudent] = useState<Student | null>(null);
+  const [works, setWorks] = useState<(Work & { student_name: string })[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/students").then((r) => r.json()),
+      fetch(`/api/works?student_id=${studentId}`).then((r) => r.json()),
+    ])
+      .then(([allStudents, worksData]) => {
+        const found = allStudents.find((s: Student) => s.id === studentId);
+        setStudent(found ?? null);
+        setWorks(worksData);
+      })
+      .finally(() => setLoading(false));
+  }, [studentId]);
+
+  if (loading) {
+    return (
+      <>
+        <Header title="Loading..." />
+        <div className="flex items-center justify-center p-20">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </>
+    );
+  }
 
   if (!student) {
     return (

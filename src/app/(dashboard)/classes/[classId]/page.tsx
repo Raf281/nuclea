@@ -1,19 +1,44 @@
 "use client";
 
-import { use } from "react";
+import { use, useState, useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { getDemoClass, getDemoStudentsByClass } from "@/lib/demo-data";
-import { ArrowRight, UserPlus } from "lucide-react";
+import { ArrowRight, UserPlus, Loader2 } from "lucide-react";
 import Link from "next/link";
+import type { ClassData, Student } from "@/lib/types";
 
 export default function ClassDetailPage({ params }: { params: Promise<{ classId: string }> }) {
   const { classId } = use(params);
-  const cls = getDemoClass(classId);
-  const students = getDemoStudentsByClass(classId);
+  const [cls, setCls] = useState<ClassData | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/classes").then((r) => r.json()),
+      fetch(`/api/students?class_id=${classId}`).then((r) => r.json()),
+    ])
+      .then(([classes, studentData]) => {
+        const found = classes.find((c: ClassData) => c.id === classId);
+        setCls(found ?? null);
+        setStudents(studentData);
+      })
+      .finally(() => setLoading(false));
+  }, [classId]);
+
+  if (loading) {
+    return (
+      <>
+        <Header title="Loading..." />
+        <div className="flex items-center justify-center p-20">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </>
+    );
+  }
 
   if (!cls) {
     return (
