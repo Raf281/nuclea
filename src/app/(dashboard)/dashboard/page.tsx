@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
   Users, FileSearch, GraduationCap, TrendingUp,
-  ArrowRight, Loader2,
+  ArrowRight,
 } from "lucide-react";
+import { SkeletonDashboard } from "@/components/ui/skeleton";
 import Link from "next/link";
 import type { DashboardStats, ClassData } from "@/lib/types";
 
@@ -40,9 +41,7 @@ export default function DashboardPage() {
     return (
       <>
         <Header title="Dashboard" subtitle="Overview of your school's analytics" />
-        <div className="flex items-center justify-center p-20">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <SkeletonDashboard />
       </>
     );
   }
