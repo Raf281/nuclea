@@ -1,29 +1,48 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/layout/header";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { DEMO_STUDENTS } from "@/lib/demo-data";
-import { Search, ArrowRight, UserPlus } from "lucide-react";
+import { Search, ArrowRight, UserPlus, Loader2 } from "lucide-react";
 import Link from "next/link";
+import type { Student } from "@/lib/types";
 
 export default function StudentsPage() {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
+  useEffect(() => {
+    fetch("/api/students")
+      .then((r) => r.json())
+      .then(setStudents)
+      .finally(() => setLoading(false));
+  }, []);
+
   const filtered = useMemo(() => {
-    if (!search) return DEMO_STUDENTS;
+    if (!search) return students;
     const q = search.toLowerCase();
-    return DEMO_STUDENTS.filter(
+    return students.filter(
       (s) =>
         s.first_name.toLowerCase().includes(q) ||
         s.last_name.toLowerCase().includes(q) ||
         s.class_name?.toLowerCase().includes(q) ||
         s.student_code?.toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [search, students]);
+
+  if (loading) {
+    return (
+      <>
+        <Header title="Students" subtitle="All students across your school" />
+        <div className="flex items-center justify-center p-20">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

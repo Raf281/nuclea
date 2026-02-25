@@ -1,20 +1,42 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DEMO_CLASSES } from "@/lib/demo-data";
-import { GraduationCap, Users, ArrowRight } from "lucide-react";
+import { GraduationCap, Users, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import type { ClassData } from "@/lib/types";
 
 export default function ClassesPage() {
+  const [classes, setClasses] = useState<ClassData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/classes")
+      .then((r) => r.json())
+      .then(setClasses)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Header title="Classes" subtitle="Manage your school's classes" />
+        <div className="flex items-center justify-center p-20">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Header title="Classes" subtitle="Manage your school's classes" />
 
       <div className="p-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {DEMO_CLASSES.map((cls) => (
+          {classes.map((cls) => (
             <Link key={cls.id} href={`/classes/${cls.id}`}>
               <Card className="hover:border-primary/50 transition-colors cursor-pointer group">
                 <CardHeader className="flex flex-row items-start justify-between">
