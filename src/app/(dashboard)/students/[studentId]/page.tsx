@@ -9,8 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RubricChart } from "@/components/analysis/rubric-chart";
 import { ScoreCards } from "@/components/analysis/score-cards";
 import { AnalysisResultView } from "@/components/analysis/analysis-result-view";
+import { LongitudinalTalentProfile } from "@/components/analysis/longitudinal-talent-profile";
 import type { Student, Work } from "@/lib/types";
-import { FileSearch, Calendar, ArrowRight, Download, Loader2 } from "lucide-react";
+import { FileSearch, Calendar, ArrowRight, Download, Loader2, Activity } from "lucide-react";
 import Link from "next/link";
 
 export default function StudentDetailPage({ params }: { params: Promise<{ studentId: string }> }) {
@@ -100,6 +101,10 @@ export default function StudentDetailPage({ params }: { params: Promise<{ studen
         <Tabs defaultValue="profile">
           <TabsList>
             <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="talent" className="flex items-center gap-1.5">
+              <Activity className="h-3.5 w-3.5" />
+              Talent Profile
+            </TabsTrigger>
             <TabsTrigger value="works">Works ({works.length})</TabsTrigger>
             {latestWork?.analysis && <TabsTrigger value="latest">Latest Analysis</TabsTrigger>}
           </TabsList>
@@ -182,6 +187,14 @@ export default function StudentDetailPage({ params }: { params: Promise<{ studen
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          {/* Longitudinal Talent Profile */}
+          <TabsContent value="talent" className="space-y-6">
+            <LongitudinalTalentProfile
+              works={works}
+              studentName={`${student.first_name} ${student.last_name}`}
+            />
           </TabsContent>
 
           {/* Works Timeline */}
