@@ -248,38 +248,93 @@ NUCLEA laeuft in zwei Modi:
 - **Branch:** `claude/nuclear-project-review-WZ42W`
 - **Commit:** 2646542
 
+### Session 6 (2026-02-26, ~UTC)
+- **Longitudinales Talent-Tracking:** Kern-Feature fuer Palantir-Positionierung
+  - `talent-aggregation.ts` — Aggregation Engine: Score-Progression, Talent-Signal-Frequenz, Domain-Fit-Evolution, Growth-Trajectories, Consistent Strengths
+  - `longitudinal-talent-profile.tsx` — Visualisierung mit Recharts: LineChart (5 Dimensionen ueber Zeit), AreaChart (Domain-Fit-Evolution), Talent-Signal-Confidence-Bars, Trajectory-Indikatoren
+  - Demo-Daten erweitert: Emma Thompson hat jetzt 4 Arbeiten (Okt 2025 → Feb 2026) mit klarer Progression von "Information Processing" zu "Pattern Recognition + Systems Thinking"
+  - Student-Profil: Neuer "Talent Profile" Tab
+- **Branch:** `claude/nuclear-project-review-WZ42W`
+- **Commit:** 1126a47
+
 ---
 
 ## Naechste Schritte / Offene TODOs
 
-- [x] Datenbank-Anbindung (Supabase) — Dual-Mode Data Layer implementiert
+### Prio 1 — Naechste Session: Kohortenvergleich-Dashboard
+> Das Feature das Schulleiter ueberzeugt. Ziel: Muster auf Klassenebene sichtbar machen.
+
+**Was gebaut werden muss:**
+1. **Klassen-Heatmap** — Grid-Ansicht: Schueler (Zeilen) x Dimensionen (Spalten), Farbe = Score. Sofort sichtbar: wer ist wo stark, wo sind Ausreisser.
+2. **Kohortenvergleich** — Dashboard-View: "Wie performt Klasse 10a vs. 8b?" Durchschnittswerte, Radar-Overlay, Staerken/Schwaechen pro Klasse.
+3. **Anomalie-Erkennung** — Automatisches Flagging: "Sofia's Evidence-Score ist 2 Standardabweichungen ueber dem Klassendurchschnitt" oder "Noah's Scores sind in den letzten 3 Arbeiten gefallen". Braucht: Berechnung von Standardabweichung pro Klasse, Vergleich individueller Scores gegen Klassen-Baseline.
+4. **Talent-Cluster** — Schueler mit aehnlichen kognitiven Profilen gruppieren. Visualisierung: Scatter-Plot oder Cluster-Badges. Ziel: "Diese 3 Schueler zeigen aehnliches Pattern Recognition — koennten von STEM-Foerderung profitieren."
+
+**Technischer Ansatz:**
+- Neue Route: `/api/cohort?class_id=` — Kohortenstatistiken berechnen
+- Neue Seite: `/(dashboard)/cohort/` oder erweiterte `/classes/[classId]`-Seite
+- Aggregation-Utility: `src/lib/analysis/cohort-aggregation.ts`
+- Komponenten: `CohortHeatmap`, `CohortComparison`, `TalentClusterView`
+- Demo-Daten: Mehr Works fuer andere Schueler (mind. Liam, Sofia, Mia) damit Kohorten-Patterns sichtbar werden
+
+### Prio 2 — MVP-Testphase Blocker
 - [ ] Supabase konfigurieren (URL + Key in .env setzen)
+- [ ] ANTHROPIC_API_KEY in Vercel Environment Variables setzen
 - [ ] Authentifizierung aktiv schalten (Login-Flow testen)
+
+### Prio 3 — Feature-Pipeline
+- [x] Datenbank-Anbindung (Supabase) — Dual-Mode Data Layer implementiert
 - [x] File-Upload (Drag & Drop) — MVP fertig
-- [ ] PDF/DOCX Text-Extraktion (Server-seitig)
-- [ ] Image OCR Integration
-- [ ] Email-Eingang (school@nuclea.com → automatischer Import)
 - [x] Schueler-Profil Erstellung ("Add Student" Modal) — fertig
 - [x] Klassen-Erstellung ("Add Class" Modal) — fertig
 - [x] Loading-Animationen (Skeleton-Loader) — fertig
-- [ ] Fortschritts-Tracking ueber Zeit
-- [x] Deployment-Setup (Vercel) — Live!
-- [ ] Custom Domain fuer Vercel
-- [ ] ANTHROPIC_API_KEY in Vercel Environment Variables setzen
+- [x] Longitudinales Talent-Tracking — fertig
+- [x] Fortschritts-Tracking ueber Zeit — fertig (Score Progression Chart)
+- [x] Talent-Matrix Aggregation — fertig (aggregiert ueber alle Analysen)
+- [ ] Kohortenvergleich-Dashboard
+- [ ] Anomalie-Erkennung (Abweichung von Baseline)
+- [ ] Talent-Cluster (aehnliche Profile gruppieren)
+- [ ] PDF/DOCX Text-Extraktion (Server-seitig)
+- [ ] PDF-Export (Reports pro Schueler/Klasse)
+- [ ] Batch-Analyse (mehrere Arbeiten gleichzeitig)
 - [ ] Mental Monitoring Beta-Seite mit echtem Inhalt fuellen
 - [ ] Talent Matching Beta-Seite mit echtem Inhalt fuellen
 - [ ] Individual Development Beta-Seite mit echtem Inhalt fuellen
 
 ---
 
+## Architektur-Ueberblick: Talent Intelligence System
+
+### 3-Schichten-Modell (Palantir-Stil)
+
+**Schicht 1: Pattern Engine (Nervensystem)**
+- Kognitive Fingerabdruecke pro Schueler
+- Anomalie-Erkennung (Abweichung vom eigenen Baseline)
+- Cross-Work Pattern Mining (domaenenuebergreifende Muster)
+- Status: Score-Progression + Talent-Signal-Frequenz implementiert ✓
+
+**Schicht 2: Talent Radar (Auge)**
+- Extremes Talent erkennen (Perzentil-Vergleich innerhalb Kohorte)
+- Kohortenvergleich (Klasse vs. Klasse)
+- Talent-Cluster (aehnliche Profile gruppieren)
+- Status: Naechste Session ←
+
+**Schicht 3: Development Intelligence (Gehirn)**
+- Individualisierte Foerderplaene basierend auf Talent-Profil
+- Fruehwarnsystem (Leistungsabfall, Motivationsverlust)
+- Gezielte Empfehlungen basierend auf Staerken-Muster
+- Status: Grundlagen vorhanden (Development Plan in Analyse), Ausbau geplant
+
+---
+
 ## Produkt-Vision / Ideen
 
 - **Email-Upload:** Schueler schicken Arbeiten an school@nuclea.com → automatisch entpackt und verarbeitet
-- **Talent-Matrix Aggregation:** Ueber mehrere Arbeiten hinweg aggregieren, nicht nur einzelne Analyse
-- **Fortschritts-Grafiken:** Zeitliche Entwicklung der Scores pro Schueler visualisieren
 - **Export:** PDF-Reports pro Schueler/Klasse generieren
-- **Klassenvergleich:** Dashboard mit Klassen-uebergreifenden Statistiken
 - **Batch-Analyse:** Mehrere Arbeiten gleichzeitig analysieren
+- **Eltern-Portal:** Read-only Zugang fuer Eltern zu Talent-Profil ihres Kindes
+- **Schul-uebergreifende Benchmarks:** Anonymisierte Vergleiche zwischen Schulen
+- **API fuer Drittanbieter:** Foerderprogramme koennten Talent-Profile abfragen (mit Consent)
 
 ---
 
@@ -289,4 +344,4 @@ NUCLEA laeuft in zwei Modi:
 - DevContainer ist konfiguriert (Port 3000)
 - Legacy-Code (Streamlit) liegt unter `/legacy/` als Referenz
 - **Deployment:** Vercel, aktuell nuclea-eight.vercel.app
-- **Letzter Stand (2026-02-25):** Skeleton-Loader, Add Student/Class Modals, CLAUDE.md komplett ueberarbeitet
+- **Letzter Stand (2026-02-26):** Longitudinales Talent-Tracking, Score Progression Charts, Talent-Signal-Aggregation
